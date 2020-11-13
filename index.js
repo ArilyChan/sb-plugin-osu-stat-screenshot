@@ -22,6 +22,7 @@ const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 const VIEWPORT = { width: 992, height: 800, deviceScaleFactor: 1.5 };
 module.exports.name ='sc-stat'
 module.exports.apply = async (app, options, storage) => {
+  options = {...defaultOptions, options}
   const cluster = await Cluster.launch({
     concurrency: Cluster.CONCURRENCY_CONTEXT,
     maxConcurrency: 2,
@@ -55,7 +56,7 @@ module.exports.apply = async (app, options, storage) => {
     if (!['osu', 'taiko', 'fruits', 'mania', undefined].includes(mode)) return meta.$send(`模式有 osu, taiko, fruits, mania. ${mode}不在其中。`)
 
   cluster.queue({
-    url: `http://localhost:3000/users/${username}/${mode ? mode : ''}`,
+    url: `${options.base}/users/${username}/${mode ? mode : ''}`,
     meta
   })
   })
