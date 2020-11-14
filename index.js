@@ -22,10 +22,11 @@ const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 const VIEWPORT = { width: 992, height: 800, deviceScaleFactor: 1.5 };
 module.exports.name ='sc-stat'
 module.exports.apply = async (app, options, storage) => {
-  options = {...defaultOptions, options}
+  options = {...defaultOptions, ...options}
   const cluster = await Cluster.launch({
     concurrency: Cluster.CONCURRENCY_CONTEXT,
     maxConcurrency: 2,
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
   })
   cluster.task(async ({ page, data: {url, meta} }) => {
     console.log(url)
