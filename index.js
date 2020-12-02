@@ -31,11 +31,10 @@ module.exports.apply = async (app, options, storage) => {
   cluster.task(async ({ page, data: {url, meta} }) => {
     console.log(url)
       await page.setViewport(VIEWPORT);
-      await page.goto(url);
-      await wait(1000);
-      await page.waitForNavigation({
+      await page.goto(url,{
         waitUntil: 'networkidle2',
       });
+      await wait(1000);
       // await page.goto(url);
       const screen = await page.screenshot({
         type: "jpeg",
