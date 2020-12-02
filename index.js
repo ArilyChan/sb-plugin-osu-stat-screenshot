@@ -70,7 +70,7 @@ module.exports.apply = async (app, options, storage) => {
     const params = command.filter(c => c.startsWith('@')).reduce((acc, command) => {
       if (command.startsWith('@last:')) acc.startHoursBefore = command.slice(6)
       if (command.startsWith('@from:')) acc.start = command.slice(6)
-      if (command.startsWith('@to:')) acc.start = command.slice(4)
+      if (command.startsWith('@to:')) acc.end = command.slice(4)
       return acc
     }, {
       startHoursBefore: 24
