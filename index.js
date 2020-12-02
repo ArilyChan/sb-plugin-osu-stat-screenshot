@@ -56,9 +56,32 @@ module.exports.apply = async (app, options, storage) => {
     mode = command[0].split('@')[1]
     if (!['osu', 'taiko', 'fruits', 'mania', undefined].includes(mode)) return meta.$send(`模式有 osu, taiko, fruits, mania. ${mode}不在其中。`)
 
-  cluster.queue({
-    url: `${options.base}/users/${username}/${mode ? mode : ''}`,
-    meta
+    cluster.queue({
+      url: `${options.base}/users/${username}/${mode ? mode : ''}`,
+      meta
+    })
   })
+
+  app.middleware((meta, next) => {
+    if (!meta.message.startsWith('!!best')) { return next() }
+    let mode = undefined
+    const command = meta.message.split(' ')
+    const username = unescapeSpecialChars(command.filter(c => !c.startsWith('@')).slice(1).join(' ').trim())
+    const params = command.filter(c => c.startsWith('@')).reduce((acc, command) => {
+      if (command.startsWith('@last:')) acc.startHoursBefore = command.slice(7)
+      if (command.startsWith('@from:')) acc.start = command.slice(7)
+      if (command.startsWith('@to:')) acc.start = command.slice(4)
+      return acc
+    }, {})
+    if (!username) return meta.$send('提供一下用户名。 !!best(@模式:[osu, taiko, fruits, mania]) osuid\nex: !!best arily, !!best@mania arily')
+
+    if (!command[0].includes('@')) mode = undefined
+    mode = command[0].split('@')[1]
+    if (!['osu', 'taiko', 'fruits', 'mania', undefined].includes(mode)) return meta.$send(`模式有 osu, taiko, fruits, mania. ${mode}不在其中。`)
+
+    cluster.queue({
+      url: `${options.base}/best/${username}/${mode || ''}?${new URLSearchParams(params)}`,
+      meta
+    })
   })
 }
