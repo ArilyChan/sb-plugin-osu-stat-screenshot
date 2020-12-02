@@ -68,8 +68,8 @@ module.exports.apply = async (app, options, storage) => {
     const command = meta.message.split(' ')
     const username = unescapeSpecialChars(command.filter(c => !c.startsWith('@')).slice(1).join(' ').trim())
     const params = command.filter(c => c.startsWith('@')).reduce((acc, command) => {
-      if (command.startsWith('@last:')) acc.startHoursBefore = command.slice(7)
-      if (command.startsWith('@from:')) acc.start = command.slice(7)
+      if (command.startsWith('@last:')) acc.startHoursBefore = command.slice(6)
+      if (command.startsWith('@from:')) acc.start = command.slice(6)
       if (command.startsWith('@to:')) acc.start = command.slice(4)
       return acc
     }, {
