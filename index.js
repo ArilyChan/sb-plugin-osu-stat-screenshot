@@ -33,6 +33,9 @@ module.exports.apply = async (app, options, storage) => {
       await page.setViewport(VIEWPORT);
       await page.goto(url);
       await wait(1000);
+      await page.waitForNavigation({
+        waitUntil: 'networkidle0',
+      });
       // await page.goto(url);
       const screen = await page.screenshot({
         type: "jpeg",
