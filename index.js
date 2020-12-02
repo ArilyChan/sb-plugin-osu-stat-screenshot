@@ -32,7 +32,7 @@ module.exports.apply = async (app, options, storage) => {
     console.log(url)
       await page.setViewport(VIEWPORT);
       await page.goto(url,{
-        waitUntil: 'networkidle2',
+        waitUntil: 'networkidle0',
       });
       await wait(1000);
       // await page.goto(url);
