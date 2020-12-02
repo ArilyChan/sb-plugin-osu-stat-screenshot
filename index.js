@@ -19,7 +19,7 @@ const { Cluster } = require('puppeteer-cluster');
 
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
-const VIEWPORT = { width: 992, height: 800, deviceScaleFactor: 1.5 };
+const VIEWPORT = { width: 992, height: 100, deviceScaleFactor: 1.5 };
 module.exports.name ='sc-stat'
 module.exports.apply = async (app, options, storage) => {
   options = {...defaultOptions, ...options}
