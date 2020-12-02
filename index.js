@@ -72,9 +72,8 @@ module.exports.apply = async (app, options, storage) => {
       if (command.startsWith('@from:')) acc.start = command.slice(6)
       if (command.startsWith('@to:')) acc.end = command.slice(4)
       return acc
-    }, {
-      startHoursBefore: 24
-    })
+    }, {})
+    if (Object.keys(params).length === 0) params.startHoursBefore = 24
     if (!username) return meta.$send('提供一下用户名。 !!best(@模式:[osu, taiko, fruits, mania]) osuid\nex: !!best arily, !!best@mania arily')
 
     if (!command[0].includes('@')) mode = undefined
