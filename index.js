@@ -34,7 +34,7 @@ module.exports.apply = async (app, options, storage) => {
       await page.goto(url);
       await wait(1000);
       await page.waitForNavigation({
-        waitUntil: 'networkidle0',
+        waitUntil: 'networkidle2',
       });
       // await page.goto(url);
       const screen = await page.screenshot({
