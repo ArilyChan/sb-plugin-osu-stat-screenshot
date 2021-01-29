@@ -65,7 +65,7 @@ module.exports.apply = async (app, options, storage) => {
   })
 
   app.middleware((meta, next) => {
-    if (!meta.message.startsWith('!!pr') || !meta.message.startsWith('!!recent') ) { return next() }
+    if (!meta.message.startsWith('!!pr') && !meta.message.startsWith('!!recent') ) { return next() }
     let mode = undefined
     const command = meta.message.split(' ')
     const username = unescapeSpecialChars(command.slice(1).join(' ').trim())
