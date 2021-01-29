@@ -65,6 +65,23 @@ module.exports.apply = async (app, options, storage) => {
   })
 
   app.middleware((meta, next) => {
+    if (!meta.message.startsWith('!!pr') || !meta.message.startsWith('!!recent') ) { return next() }
+    let mode = undefined
+    const command = meta.message.split(' ')
+    const username = unescapeSpecialChars(command.slice(1).join(' ').trim())
+    if (!username) return meta.$send('提供一下用户名。 !!pr(@模式:[osu, taiko, fruits, mania]) osuid\nex: !!pr arily, !!pr@mania arily')
+
+    if (!command[0].includes('@')) mode = undefined
+    mode = command[0].split('@')[1]
+    if (!['osu', 'taiko', 'fruits', 'mania', undefined].includes(mode)) return meta.$send(`模式有 osu, taiko, fruits, mania. ${mode}不在其中。`)
+
+    cluster.queue({
+      url: `${options.base}/recent/${username}/${mode ? mode : ''}`,
+      meta
+    })
+  })
+
+  app.middleware((meta, next) => {
     if (!meta.message.startsWith('!!best')) { return next() }
     let mode = undefined
     const command = meta.message.split(' ')
