@@ -1,5 +1,5 @@
 const defaultOptions = {
-  base: 'http://localhost:3006'
+  base: 'http://localhost:3006/cn'
 }
 const specialChars = {
   '&': '&amp;',
