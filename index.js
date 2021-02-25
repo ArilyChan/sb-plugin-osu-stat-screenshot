@@ -26,7 +26,8 @@ module.exports.apply = async (app, options, storage) => {
   const cluster = await Cluster.launch({
     concurrency: Cluster.CONCURRENCY_CONTEXT,
     maxConcurrency: 2,
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    skipDuplicateUrls: true,
   })
   cluster.task(async ({ page, data: {url, meta} }) => {
     console.log(url)
