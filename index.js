@@ -27,28 +27,34 @@ module.exports.apply = async (app, options, storage) => {
     concurrency: Cluster.CONCURRENCY_CONTEXT,
     maxConcurrency: 2,
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    skipDuplicateUrls: true,
+
   })
   cluster.task(async ({ page, data: {url, meta} }) => {
     console.log(url)
-      await page.setViewport(VIEWPORT);
-      await page.goto(url,{
-        waitUntil: 'networkidle0',
-      });
-      await wait(1000);
-      // await page.goto(url);
-      const screen = await page.screenshot({
-        type: "jpeg",
-        encoding: "base64", 
-        fullPage: true
-      });
-      // Store screenshot, do something else
-      const cqcode = `[CQ:image,file=base64://${screen}]`
-      meta.$send(cqcode).catch(err => console.warn(err))
+    await page.setViewport(VIEWPORT);
+     await page.goto(url,{
+      waitUntil: 'networkidle0',
+    });
+    // await wait(1000);
+    // await page.goto(url);
+    const screen = await page.screenshot({
+      type: "png",
+      encoding: "base64", 
+      fullPage: true
+    });
+    // Store screenshot, do something else
+    const cqcode = `[CQ:image,file=base64://${screen}]`
+    meta.$send(cqcode).catch(err => console.warn(err))
   })
+  cluster.on('taskerror', (err, data, willRetry) => {
+      if (willRetry) {
+        console.warn(`Encountered an error while crawling ${data}. ${err.message}\nThis job will be retried`);
+      } else {
+        console.error(`Failed to crawl ${data}: ${err.message}`);
+      }
+  });
 
-
-  app.middleware((meta, next) => {
+  app.middleware(async (meta, next) => {
     if (!meta.message.startsWith('!!stat')) { return next() }
     let mode = undefined
     const command = meta.message.split(' ')
@@ -59,13 +65,13 @@ module.exports.apply = async (app, options, storage) => {
     mode = command[0].split('@')[1]
     if (!['osu', 'taiko', 'fruits', 'mania', undefined].includes(mode)) return meta.$send(`模式有 osu, taiko, fruits, mania. ${mode}不在其中。`)
 
-    cluster.queue({
+    await cluster.execute({
       url: `${options.base}/users/${username}/${mode ? mode : ''}`,
       meta
     })
   })
 
-  app.middleware((meta, next) => {
+  app.middleware(async (meta, next) => {
     if (!meta.message.startsWith('!!pr') && !meta.message.startsWith('!!recent') ) { return next() }
     let mode = undefined
     const command = meta.message.split(' ')
@@ -76,13 +82,13 @@ module.exports.apply = async (app, options, storage) => {
     mode = command[0].split('@')[1]
     if (!['osu', 'taiko', 'fruits', 'mania', undefined].includes(mode)) return meta.$send(`模式有 osu, taiko, fruits, mania. ${mode}不在其中。`)
 
-    cluster.queue({
+    await cluster.execute({
       url: `${options.base}/recent/${username}/${mode ? mode : ''}`,
       meta
     })
   })
 
-  app.middleware((meta, next) => {
+  app.middleware(async (meta, next) => {
     if (!meta.message.startsWith('!!best')) { return next() }
     let mode = undefined
     const command = meta.message.split(' ')
@@ -100,7 +106,7 @@ module.exports.apply = async (app, options, storage) => {
     mode = command[0].split('@')[1]
     if (!['osu', 'taiko', 'fruits', 'mania', undefined].includes(mode)) return meta.$send(`模式有 osu, taiko, fruits, mania. ${mode}不在其中。`)
 
-    cluster.queue({
+    await cluster.execute({
       url: `${options.base}/best/${username}/${mode || ''}?${new URLSearchParams(params)}`,
       meta
     })
